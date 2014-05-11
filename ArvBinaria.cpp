@@ -1,9 +1,16 @@
 #include <iostream>
  using namespace std;
+#define chave 17;
+class Node{
+ private:
 
+ public:
+
+};
  class ArvBinaria{
  private:
     int tamanho;
+    Node hd [];
  public:
     ArvBinaria(int tam);
     int getTamanho(){
@@ -14,6 +21,14 @@
     }
     void inicializar(int t){
         setTamanho(t);
+    }
+    //Método incompleto, não executar
+    bool isCrash(int i){
+        bool crash=false;
+        if(true){
+            crash=true;
+        }
+        return crash;
     }
     void inserir(){
     }

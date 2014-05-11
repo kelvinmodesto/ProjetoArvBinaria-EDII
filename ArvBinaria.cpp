@@ -24,7 +24,16 @@
         }
         return crash;
     }
-    void inserir(){
+    //Cuidado com ponteiros no array
+    bool inserir(int value){
+      int q= value % chave;
+      bool OK = false;
+        if(hd[q]==NULL){
+            hd[q]= value;
+            OK= true;
+        }else{
+        }
+    return OK;
     }
     void remover(){
     }

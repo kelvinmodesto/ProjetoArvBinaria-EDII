@@ -1,16 +1,10 @@
 #include <iostream>
  using namespace std;
 #define chave 17;
-class Node{
- private:
-
- public:
-
-};
  class ArvBinaria{
  private:
     int tamanho;
-    Node hd [];
+    int hd[];
  public:
     ArvBinaria(int tam);
     int getTamanho(){

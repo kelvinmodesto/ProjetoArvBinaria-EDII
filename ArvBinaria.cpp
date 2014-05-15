@@ -1,11 +1,13 @@
+
 #include <iostream>
 using namespace std;
-const int chave = 17;
+const int chave = 11;
 int tamanho =17;
 //Implementação da árvore em array
 class ArrayTree{
     private:
-    int tree[chave-1];
+    int tree[chave]={0};
+    int flag=0;
     public:
 //     Árvore array implementada em niveis onde
 //     o filho esquerdo de um no i é igual a 2i+1
@@ -63,6 +65,32 @@ class ArrayTree{
             return true;
         }
         }
+    bool isVazia(int pos){
+        if(isValido(pos) && tree[pos] == 0 ){
+            return true;
+        }
+    }
+    int encontrar(int value){
+        int i=0,j=0;
+        while(tree[i] != value){
+            i++;
+        }
+     if(tree[i] != 0){
+        j=tree[i];
+     }
+     return j;
+    }
+    void imprimir(){
+        for(int i=0;i<chave;i++){
+            cout<<i<<" : " <<tree[i]<<endl;
+        }
+    }
+    int getFlag(){
+        return flag;
+    }
+    void setFlag(){
+        flag++;
+    }
 };
  //Atribuir que valores os registros armazenaram
  //Verificar se realmente é necessário essa struct
@@ -74,7 +102,8 @@ class ArvBinaria{
  private:
 
         int tamanho;
-    int Hash[chave-1];
+    int reg[chave];
+    ArrayTree at;
  public:
     ArvBinaria(int tam);
     int getTamanho(){
@@ -83,22 +112,37 @@ class ArvBinaria{
     void setTamanho(){
         tamanho=chave;
     }
+    void inserir(int v){
+      int q= hash(v);
+        inserirAux(v,q);
+    }
     //Cuidado com ponteiros no array
     //Método Incompleto
-    bool inserir(int value){
-        ArrayTree arvore;
-      int q= value % chave;
+    bool inserirAux(int value, int q){
       bool OK = false;
-        if(Hash[q]  ==0){
-            Hash[q]= value;
+        if(reg[q]  ==0){
+            reg[q]= value;
             OK= true;
         }else{
-
-        }
+//            at.setNode(at.flag);
+//            at.setFlag();
+            int p =inc(value);
+            inserirAux(value,p);
+            }
     return OK;
     }
+    int hash(int p){
+        return p % chave;
+    }
+    int inc(int q){
+        int p=q/chave;
+        return p % chave;
+
+    }
+    //se o nó for ímpar utilize esse método
     void mover(){
     }
+    //Se o nó for par utiliza esse método
     void continuar(){
     }
     void remover(){
@@ -106,12 +150,17 @@ class ArvBinaria{
     void buscar(){
     }
 
+
  };
 //Construtor da classe
- ArvBinaria::ArvBinaria(int tam){
-    setTamanho();
- }
+// ArvBinaria::ArvBinaria(int tam){
+//    setTamanho();
+// }
  int main(){
-     cout << "Hi" << endl;
+     ArrayTree at;
+     //at.imprimir();
+    // ArvBinaria ab;
+     int k= 29/11;
+     cout<< k%11<<endl;
      return 0;
  }

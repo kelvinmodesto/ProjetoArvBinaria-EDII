@@ -1,3 +1,5 @@
+#include <Arvore.h>
+
 class Arvore {
 private:
     int tam = 11;

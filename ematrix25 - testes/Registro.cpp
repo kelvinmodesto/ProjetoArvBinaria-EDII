@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstring>
+#include <Registro.h>
 
 using namespace std;
 

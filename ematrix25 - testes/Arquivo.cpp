@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <Registro.cpp>
+#include <Arquivo.h>
+#include <Registro.h>
 
 using namespace std;
 
@@ -12,9 +13,9 @@ private:
     int elem = 0;
 
     void contElem() {
-        while(arq.good()) {
+        while (arq.good()) {
             arq.read((char *) &reg, sizeof (reg));
-            if(reg.getChave()>0)
+            if (reg.getChave() > 0)
                 elem++;
         }
     }
@@ -46,7 +47,7 @@ public:
     }
 
     void inserir(Registro reg) {
-        arq.clear();        
+        arq.clear();
         //Arvore.cpp obtem a pos da chave do Registro
         arq.seekp(0, ios::end);
         arq.write((char *) &reg, sizeof (reg));
@@ -59,11 +60,11 @@ public:
         arq.read((char *) &reg, sizeof (reg));
         return reg;
     }
-    
+
     Registro remover(int chave) {
         Registro aux;
         aux = buscar(chave);
-        arq.clear();        
+        arq.clear();
         //Arvore.cpp obtem a pos da chave
         arq.seekp(0);
         reg.setChave("-1");

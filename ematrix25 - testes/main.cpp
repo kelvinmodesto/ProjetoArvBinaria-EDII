@@ -3,13 +3,13 @@
 #include <cstring>
 #include <fstream>
 #include <iomanip>
-#include <Registro.cpp>
-#include <Arquivo.cpp>
+#include "Arquivo.h"
+#include "Registro.h"
 
 using namespace std;
 
 Registro ler(Registro reg) {
-    string aux;    
+    string aux;
     cout << "Digite a chave: ";
     cin >> aux;
     reg.setChave(aux);

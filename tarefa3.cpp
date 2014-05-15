@@ -13,6 +13,17 @@ private:
     char dado[9];
 public:
 
+    Registro() {
+        
+    }
+
+    Registro(string chave, string dado) {
+        strncpy(this->chave, chave.c_str(), 2);
+        chave[2] = '\0';
+        strncpy(this->dado, dado.c_str(), 8);
+        dado[8] = '\0';
+    }
+
     void setChave(string chave) {
         strncpy(this->chave, chave.c_str(), 2);
         chave[2] = '\0';
@@ -41,11 +52,13 @@ private:
 
     void contElem() {
         elem = 0;
-        int chave;
+        int chave, cont = 0;
         cout << "Contagem de elementos" << endl;
-        while (arq.good()) {            
+        arq.clear();
+        arq.seekg(0,ios::beg);
+        while (arq.good()) {
             arq.read((char *) &reg, sizeof (reg));
-            cout << reg.getChave() << " " << reg.getDado() << endl;
+            cout << cont++ << " " << reg.getChave() << " " << reg.getDado() << endl;
             chave = atoi(reg.getChave().c_str());
             if (chave > 0)
                 elem++;
@@ -55,10 +68,10 @@ private:
 
     void inicArq() {
         cout << "Inicializando o arquivo" << endl;
-        reg.setChave("0");
-        reg.setDado("  ");
-        for (int i = 0; i < tam; i++) {
-            cout << reg.getChave() << " " << reg.getDado() << endl;
+        arq.clear();
+        arq.seekp(0,ios::beg);
+        reg = {"0"," "};
+        for (int i = 0; i < tam; i++) {            
             arq.write((char *) &reg, sizeof (reg));
         }
         cout << endl;
@@ -97,16 +110,15 @@ public:
 
     Registro buscar(int pos) {
         arq.clear();
-        arq.seekg(pos);
+        arq.seekg(pos, ios::beg);
         arq.read((char *) &reg, sizeof (reg));
         return reg;
     }
 
     int remover(int pos) {
         arq.clear();
-        arq.seekp(pos);
-        reg.setChave("-1");
-        reg.setDado("  ");
+        arq.seekp(pos, ios::beg);
+        reg = {"-1"," "};
         arq.write((char *) &reg, sizeof (reg));
         return --elem;
     }
@@ -259,9 +271,11 @@ int main() {
     Registro reg;
     Arquivo arq;
     if (arq.isOK()) {
-        arq.inserir(2, ler(reg));
-        reg = arq.buscar(2);
-        cout << reg.getChave() << " " << reg.getDado() << endl;
+        //arq.inserir(0, ler(reg));
+        reg = arq.buscar(0);
+        cout << "Reg[0] = " << reg.getChave() << " " << reg.getDado() << endl;
+        reg = arq.buscar(1);
+        cout << "Reg[1] = " << reg.getChave() << " " << reg.getDado() << endl;
     }
     return 0;
 }

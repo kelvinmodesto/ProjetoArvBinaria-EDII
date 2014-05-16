@@ -14,7 +14,7 @@ private:
 public:
 
     Registro() {
-        
+
     }
 
     Registro(string chave, string dado) {
@@ -52,14 +52,15 @@ private:
 
     void contElem() {
         elem = 0;
-        int chave, cont = 0;
-        cout << "Contagem de elementos" << endl;
+        int chave,cont=0;
         arq.clear();
-        arq.seekg(0,ios::beg);
+        arq.seekg(0, ios::beg);
+        cout << "Contagem de elementos" << endl;
         while (arq.good()) {
             arq.read((char *) &reg, sizeof (reg));
-            cout << cont++ << " " << reg.getChave() << " " << reg.getDado() << endl;
-            chave = atoi(reg.getChave().c_str());
+            chave = atoi(reg.getChave().c_str());cont++;
+            cout << "R[" << cont << "] = ";
+            cout << reg.getChave() << " " << reg.getDado() << endl;
             if (chave > 0)
                 elem++;
         }
@@ -69,9 +70,9 @@ private:
     void inicArq() {
         cout << "Inicializando o arquivo" << endl;
         arq.clear();
-        arq.seekp(0,ios::beg);
-        reg = {"0"," "};
-        for (int i = 0; i < tam; i++) {            
+        arq.seekp(0, ios::beg);
+        reg = Registro("0", "");
+        for (int i = 0; i < tam; i++) {
             arq.write((char *) &reg, sizeof (reg));
         }
         cout << endl;
@@ -80,7 +81,7 @@ public:
 
     Arquivo() {
         tam = 11;
-        arq.open("registros.dat", ios::in | ios::out | ios::app | ios::binary);
+        arq.open("registros.dat", ios::in | ios::out | ios::binary);
         if (arq) {
             contElem();
             if (elem == 0)
@@ -91,6 +92,7 @@ public:
             cerr << "O arquivo nao foi aberto" << endl;
             ok = false;
         }
+        cout << endl;
     }
 
     ~Arquivo() {
@@ -118,7 +120,7 @@ public:
     int remover(int pos) {
         arq.clear();
         arq.seekp(pos, ios::beg);
-        reg = {"-1"," "};
+        reg = Registro("-1", "");
         arq.write((char *) &reg, sizeof (reg));
         return --elem;
     }
@@ -258,24 +260,57 @@ public:
 
 Registro ler(Registro reg) {
     string aux;
+    cout << "Inserir registro" << endl;
     cout << "Digite a chave: ";
     cin >> aux;
     reg.setChave(aux);
     cout << "Digite o dado: ";
     cin >> aux;
     reg.setDado(aux);
+    cout << endl;
     return reg;
+}
+
+void exibir(Registro reg) {
+    cout << "Buscar registro" << endl;
+    cout << "Reg[0] = " << reg.getChave() << " " << reg.getDado() << endl;
+    cout << endl;
+}
+
+int sair() {
+    cin.ignore();
+    cin.get();
+    return 0;
 }
 
 int main() {
     Registro reg;
     Arquivo arq;
     if (arq.isOK()) {
-        //arq.inserir(0, ler(reg));
-        reg = arq.buscar(0);
-        cout << "Reg[0] = " << reg.getChave() << " " << reg.getDado() << endl;
-        reg = arq.buscar(1);
-        cout << "Reg[1] = " << reg.getChave() << " " << reg.getDado() << endl;
+        int op = 0;
+        while (true) {
+            cout << "Manipulador de registros" << endl;
+            cout << "1 - Inserir um registro" << endl;
+            cout << "2 - Buscar um registro" << endl;
+            cout << "3 - Remover um registro" << endl;
+            cout << "4 - Exibir todos os registros" << endl;
+            cout << "5 - Sair do programa" << endl;
+            cout << "Escolha uma opcao: ";
+            cin >> op;
+            cout << endl;
+            switch (op) {
+                case 1: arq.inserir(0, ler(reg));
+                    break;
+                case 2: exibir(arq.buscar(0));
+                    break;
+                case 3: arq.remover(0);
+                    break;
+                case 4: break;
+                case 5: cout << "Fim do programa";
+                    return sair();
+                default: cout << "Escolha uma opcao valida" << endl;
+                    break;
+            }
+        }
     }
-    return 0;
 }

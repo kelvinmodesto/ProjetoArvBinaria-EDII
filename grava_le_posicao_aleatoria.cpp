@@ -20,13 +20,14 @@
 	void gera_arquivo_modelo();
 	void buscarTermo();
 	void gera_arquivo_vazio();
+	void remover();
 
 	int main () {
 		system("cls");
 		int i, opcao;
 		menu();
 		do {
-			cout << "Entre com uma opcao: ";
+			cout << "|Entre com uma opcao: ";
 			cin >> opcao;;
 			cout << endl;
 
@@ -34,8 +35,7 @@
 				case 0:
 					system("cls");
 					menu();
-					gera_arquivo_modelo();
-					cout << " Arquivo modelo usado para o trabalho foi criado!" << endl;
+					gera_arquivo_modelo();					
 				break;
 				case 1:
 					system("cls");
@@ -46,25 +46,30 @@
 					system("cls");
 					menu();
 					cadastrar_termo();
-					break;				
-				case 3:
+					break;							
+				case 3:					
+					system("cls");
+					menu();
+					remover();
+					break;
+				case 4:
 					system("cls");
 					menu();
 					buscarTermo();
 				break;
-				case 4:
+				case 5:
 					system("cls");
 					menu();
 					exibirTermo();
 					break;				
-				case 5:
+				case 6:
 					break;
 				default:
 					system("cls");
 					menu();
 					cout << "Opcao invalida! Utilize menu.\n";
 			}
-		} while (opcao != 5);
+		} while (opcao != 6);
 		
 		cout << "S A I N D O . . . " << endl;
 		
@@ -74,14 +79,15 @@
 	
 	void menu() {
 		cout << "|===============================================|\n";
-		cout << "|\tSISTEMA GLOSSARIO v0.01 [soh consulta]\t|\n";
+		cout << "|\t\tSISTEMA GLOSSARIO v0.01 \t|\n";
 		cout << "|===============================================|\n";
 		cout << "|0 - Criar arquivo de modelo \t\t\t|\n";
 		cout << "|1 - Gera arquivo vazio \t\t\t|\n";
 		cout << "|2 - Inserir termo \t\t\t\t|\n";
-		cout << "|3 - Buscar termo no arquivo\t\t\t|\n";
-		cout << "|4 - Exibir todos os termos\t\t\t|\n";
-		cout << "|5 - Sair\t\t\t\t\t|\n";
+		cout << "|3 - Remover termo \t\t\t\t|\n";
+		cout << "|4 - Buscar termo no arquivo\t\t\t|\n";
+		cout << "|5 - Exibir todos os termos\t\t\t|\n";
+		cout << "|6 - Sair\t\t\t\t\t|\n";
 		cout << "|-----------------------------------------------|\n";
 	}
 	//*********************************************************************************
@@ -106,10 +112,31 @@
 		cout << "|Significado: ";
 		cin.getline(no.sig, 50);
 
-		arquivo.seekp(( no.id % TAMANHO ) * sizeof(no));		
+		arquivo.seekp(( no.id % TAMANHO ) * sizeof(no));				
 		arquivo.write( reinterpret_cast<const char*>(&no), sizeof(no) );	
+		arquivo.close();
+		
+		cout << "|Termo \'" << no.termo << "\' inserido na posicao " << (no.id % TAMANHO ) << " \t\t\t\t" << endl;
+		cout << "|-----------------------------------------------|" << endl;
 	}
 	//*********************************************************************************
+	
+	void remover(){
+		int chave;
+		fstream arquivo(NOME_ARQUIVO, ios::in| ios::out | ios::binary );
+		
+		cout << "|ID a remover: ";
+		cin.get();
+		cin >> chave;
+		
+		arquivo.seekp((chave % 11) * sizeof(no)); 	// ainda não detecta colisao, até pq quem vai fazer isso vai ser a arvore
+													// não precisa alteração.
+		no no = {-1, "", ""};
+		
+		arquivo.write( reinterpret_cast<const char*>(&no), sizeof(no) );
+		cout << "|Termo \'" << chave << "\' removido com sucesso!\t\t\t\t" << endl;
+		cout << "|-----------------------------------------------|" << endl;		
+	}
 	
 	void exibirTermo() {
 		no no;
@@ -206,6 +233,8 @@
 		arquivo.write((char*)&no9, sizeof(no) );
 		arquivo.write((char*)&no10, sizeof(no) );		
 		
+		cout << "|Arquivo modelo usado para o trabalho criado!\t|" << endl;
+		cout << "|-----------------------------------------------|" << endl;
 		arquivo.close();			
 	}
 	//*********************************************************************************
@@ -218,6 +247,9 @@
 		
 		for( int i = 0; i < TAMANHO; i++)
 			arquivo.write((char*)&no,(sizeof(struct no)));
+			
+		cout << "|Arquivo vazio usado para o trabalho criado!\t|" << endl;
+		cout << "|-----------------------------------------------|" << endl;			
 			
 	}
 	

@@ -81,7 +81,7 @@ void inic() {
 
 void ins() {
     if (elem == 11) {
-        cerr << "O registro nao foi inserido" << endl;
+        cout << "O registro nao foi inserido" << endl;
         return;
     }
     int chave, aux;
@@ -116,7 +116,7 @@ void ins() {
         if(arv.temProx()) {
             cout << "O registro foi inserido" << endl;
         } else {
-            cerr << "O registro nao foi inserido" << endl;
+            cout << "O registro nao foi inserido" << endl;
         }
     }
     cout << endl;
@@ -148,7 +148,7 @@ void busc() {
             arv.calcPos(chave);
         }
         if(!arv.temProx()) {
-            cerr << "O registro nao foi encontrado" << endl;
+            cout << "O registro nao foi encontrado" << endl;
         }
     }
     cout << endl;
@@ -162,13 +162,15 @@ void rem() {
     cin >> chave;
     int pos = arv.calcPos(chave);
     if (regs[pos] == chave) {
-        regs[pos] = -1;
+	        regs[pos] = -1;
+			elem--;
     } else {
         while (arv.temProx()) {
             if (!arv.isProxNoDir()) {
                 pos = arv.calcPos(chave);
                 if (regs[pos] == chave) {
                     regs[pos] = -1;
+					elem--;
                     break;
                 }
             }
@@ -177,7 +179,7 @@ void rem() {
         if(arv.temProx()) {
             cout << "O registro foi removido" << endl;
         } else {
-            cerr << "O registro nao foi encontrado" << endl;
+            cout << "O registro nao foi encontrado" << endl;
         }
     }
     cout << endl;

@@ -14,7 +14,7 @@ using namespace std;
 class Registro {
 private:
     char chave[3];
-    char dado[9];
+    char dado[27];
 public:
 
     Registro() {
@@ -24,8 +24,8 @@ public:
     Registro(string chave, string dado) {
         strncpy(this->chave, chave.c_str(), 2);
         chave[2] = '\0';
-        strncpy(this->dado, dado.c_str(), 8);
-        dado[8] = '\0';
+        strncpy(this->dado, dado.c_str(), 26);
+        dado[26] = '\0';
     }
 
     void setChave(string chave) {
@@ -34,8 +34,8 @@ public:
     }
 
     void setDado(string dado) {
-        strncpy(this->dado, dado.c_str(), 8);
-        dado[8] = '\0';
+        strncpy(this->dado, dado.c_str(), 26);
+        dado[26] = '\0';
     }
 
     int getIChave() {
@@ -128,7 +128,7 @@ int elem;
 
 void inic() {
     ofstream arq;
-    arq.open(NOME_ARQ, ios::binary);
+    arq.open(NOME_ARQ, ios::out | ios::binary);
     if (!arq) {
         cerr << "O arquivo nao foi aberto" << endl << endl;
         return;
@@ -140,24 +140,23 @@ void inic() {
     arq.close();
 }
 
-void cont() {
+bool cont() {
     elem = 0;
     Registro reg;
     ifstream arq;
-    arq.open(NOME_ARQ, ios::trunc | ios::binary);
+    arq.open(NOME_ARQ, ios::in | ios::binary);
     if (!arq) {
-        cerr << "O arquivo nao foi aberto" << endl << endl;
-        return;
+        arq.close();
+        inic();
+        arq.open(NOME_ARQ, ios::in | ios::binary);
     }
     arq.seekg(0);
     while (!arq.eof()) {
         arq.read((char*) &reg, sizeof (reg));
-        elem++;
+        if (reg.getIChave() > 0)
+            elem++;
     }
     arq.close();
-    if (elem < TAM) {
-        inic();
-    }
 }
 
 Registro lerReg() {
@@ -195,6 +194,7 @@ void ins() {
         arq.seekp(pos * sizeof (regNovo));
         arq.write((char*) &regNovo, sizeof (regNovo));
         elem++;
+        cout << "O registro foi inserido" << endl;
     } else {
         Registro regAnt;
         while (arv.temProx()) {
@@ -242,13 +242,13 @@ int lerCh() {
 }
 
 void exibReg(Registro reg, int pos) {
-    cout << "Encontrou o registro \"" << reg.getDado();
-    cout << "\" na posicao " << pos << endl;
+    cout << "Encontrou o registro '" << reg.getDado();
+    cout << "' na posicao " << pos << endl;
 }
 
 void busc() {
     ifstream arq;
-    arq.open(NOME_ARQ, ios::binary);
+    arq.open(NOME_ARQ, ios::in | ios::binary);
     if (!arq) {
         cerr << "O arquivo nao foi aberto" << endl << endl;
         return;
@@ -301,6 +301,8 @@ void rem() {
         arq.seekp(pos * sizeof (regNovo));
         arq.write((char*) &regNovo, sizeof (regNovo));
         elem--;
+        cout << "Removeu o registro '" << regAtual.getDado();
+        cout << "' na posicao " << pos << endl;
     } else {
         while (arv.temProx()) {
             if (!arv.isProxNoDir()) {
@@ -317,8 +319,8 @@ void rem() {
             arv.calcPos(chave);
         }
         if (arv.temProx()) {
-            cout << "Removeu o registro \"" << regAtual.getDado();
-            cout << "\" na posicao " << pos << endl;
+            cout << "Removeu o registro '" << regAtual.getDado();
+            cout << "' na posicao " << pos << endl;
         } else {
             cout << "O registro nao foi encontrado" << endl;
         }
@@ -329,7 +331,7 @@ void rem() {
 
 void exib() {
     ifstream arq;
-    arq.open(NOME_ARQ, ios::binary);
+    arq.open(NOME_ARQ, ios::in | ios::binary);
     if (!arq) {
         cerr << "O arquivo nao foi aberto" << endl << endl;
         return;
@@ -337,11 +339,14 @@ void exib() {
     Registro reg;
     cout << "Exibir registros" << endl;
     arq.seekg(0);
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < TAM; i++) {
         arq.read((char*) &reg, sizeof (reg));
-        cout << "Reg[" << i << "] = ";
-        cout << reg.getChave() << ", ";
-        cout << reg.getDado() << endl;
+        if (i < 10)
+            cout << "Reg[0" << i << "] = ";
+        else
+            cout << "Reg[" << i << "] = ";
+        cout << reg.getChave() << ", '";
+        cout << reg.getDado() << "'" << endl;
     }
     arq.close();
     cout << endl;

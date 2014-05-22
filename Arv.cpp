@@ -1,12 +1,13 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
+#include <stack>
 
 using namespace std;
 
 class Arv {
 private:
-    int tam, elem, arv[55];
+    int tam, elem, arv[tam*5];
 
     int hash(int chave) {
         return chave % tam;
@@ -50,15 +51,31 @@ public:
     }
 
     int getNoPai(int i) {
-        if (i % 2 == 0) {//NoPai do NoDir
-            return arv[(elem - 2) / 2];
+        return arv[getNoPaiId(i)];
+    }
+
+    int getNoPaiId(int i) {
+        if (isNoDir(i)) {//NoPai do NoDir
+            return (i - 2) / 2;
         } else {//NoPai do NoEsq
-            return arv[(elem - 1) / 2];
+            return (i - 1) / 2;
         }
     }
 
+    bool isNoRaiz(int i) {
+        return i == 0;
+    }
+
+    bool isNoDir(int i) {
+        return i % 2 == 0;
+    }
+
     int getNoId() {
-        return elem - 1;
+        return elem-1;
+    }
+    
+    int getProxNoId() {
+        return elem;
     }
 
     bool temProx() {
@@ -79,13 +96,35 @@ void inic() {
     }
 }
 
+Arv insAux(Arv arv,int chave) {
+    int pos, aux, id;
+    if (arv.isProxNoDir()) {
+        id = arv.getProxNoId();
+        aux = arv.getNoPai(id);
+        pos = arv.calcPos(regs[aux]);
+        if (regs[pos] <= 0) {
+            return arv;
+        }
+        else {
+            return insAux(arv,regs[aux]);
+        }           
+    } else {
+        pos = arv.calcPos(chave);
+        if (regs[pos] <= 0) {
+            return arv;
+        }
+    }
+}
+
 void ins() {
     if (elem == 11) {
         cout << "O registro nao foi inserido" << endl;
         return;
     }
-    int chave, aux;
+    int chave, aux, regAux, id;
     Arv arv;
+    bool ok = false;
+    stack<int> pilha, pilhaId;
     cout << "Inserir registro" << endl;
     cout << "Chave: ";
     cin >> chave;
@@ -93,27 +132,59 @@ void ins() {
     if (regs[pos] <= 0) {
         regs[pos] = chave;
         elem++;
+        ok = true;
     } else {
-        while (arv.temProx()) {
-            if (arv.isProxNoDir()) {
-                aux = arv.getNoPai(arv.getNoId());
-                pos = arv.calcPos(regs[aux]);
-                if (regs[pos] <= 0) {
-                    regs[pos] = regs[aux];
-                    regs[aux] = chave;
+//        while (arv.temProx()) {
+//            id = arv.getProxNoId();
+//            if (arv.isProxNoDir()) {
+//                aux = arv.getNoPai(id);
+//                pos = arv.calcPos(regs[aux]);
+//                if (regs[pos] <= 0) {
+//                    regs[pos] = regs[aux];
+//                    regs[aux] = chave;
+//                    elem++;
+//                    break;
+//                }
+//            } else {
+//                pos = arv.calcPos(chave);
+//                if (regs[pos] <= 0) {
+//                    regs[pos] = chave;
+//                    elem++;
+//                    break;
+//                }
+//            }
+//        }
+        //Caminha a arvore do no vazio ate a raiz
+        id = arv.getNoId();
+        while (!arv.isNoRaiz(id)) {
+            pilha.push(pos);
+            pilhaId.push(id);
+            pos = arv.getNoPai(id);
+            id = arv.getNoPaiId(id);
+        }
+        //Desempilha as posicoes e as ids dos nos da arvore
+        while (!pilha.empty()) {
+            pos = pilha.pop();
+            id = pilhaId.pop;
+            if (arv.isNoDir(id)) {
+                aux = arv.getNoPai(id);
+                regAux = regs[pos];
+                regs[pos] = regs[aux];
+                regs[aux] = chave;
+                chave = regAux;
+                if (!ok) {
                     elem++;
-                    break;
-                }
-            } else {
-                pos = arv.calcPos(chave);
-                if (regs[pos] <= 0) {
-                    regs[pos] = chave;
-                    elem++;
-                    break;
+                    ok = true;
                 }
             }
         }
-        if(arv.temProx()) {
+        //Caso insira por caminhamento
+        if (pilha.empty()&&!ok) {
+            regs[pos] = chave;
+            elem++;
+            ok = true;
+        }
+        if (ok) {
             cout << "O registro foi inserido" << endl;
         } else {
             cout << "O registro nao foi inserido" << endl;
@@ -147,7 +218,7 @@ void busc() {
             }
             arv.calcPos(chave);
         }
-        if(!arv.temProx()) {
+        if (!arv.temProx()) {
             cout << "O registro nao foi encontrado" << endl;
         }
     }
@@ -162,21 +233,21 @@ void rem() {
     cin >> chave;
     int pos = arv.calcPos(chave);
     if (regs[pos] == chave) {
-	        regs[pos] = -1;
-			elem--;
+        regs[pos] = -1;
+        elem--;
     } else {
         while (arv.temProx()) {
             if (!arv.isProxNoDir()) {
                 pos = arv.calcPos(chave);
                 if (regs[pos] == chave) {
                     regs[pos] = -1;
-					elem--;
+                    elem--;
                     break;
                 }
             }
             arv.calcPos(chave);
         }
-        if(arv.temProx()) {
+        if (arv.temProx()) {
             cout << "O registro foi removido" << endl;
         } else {
             cout << "O registro nao foi encontrado" << endl;
@@ -214,10 +285,14 @@ int main() {
         cin >> op;
         cout << endl;
         switch (op) {
-            case 1: ins();break;
-            case 2: busc();break;
-            case 3: rem();break;
-            case 4: exib();break;
+            case 1: ins();
+                break;
+            case 2: busc();
+                break;
+            case 3: rem();
+                break;
+            case 4: exib();
+                break;
             case 5: return 0;
             default: cout << "Opcao invalida" << endl;
         }

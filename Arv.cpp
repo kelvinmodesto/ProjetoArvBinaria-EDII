@@ -7,7 +7,7 @@ using namespace std;
 
 class Arv {
 private:
-    int tam, elem, arv[tam*5];
+    int tam, elem, arv[55];
 
     int hash(int chave) {
         return chave % tam;
@@ -98,21 +98,18 @@ void inic() {
 
 Arv insAux(Arv arv,int chave) {
     int pos, aux, id;
+    //Verifica se ta vazio a posicao
+    id = arv.getProxNoId();
+    aux = arv.getNoPai(id);
+    pos = arv.calcPos(regs[aux]);
+    if (regs[pos] <= 0) {
+        return arv;
+    }
+    //Nao estando vazio executa insAux de 
     if (arv.isProxNoDir()) {
-        id = arv.getProxNoId();
-        aux = arv.getNoPai(id);
-        pos = arv.calcPos(regs[aux]);
-        if (regs[pos] <= 0) {
-            return arv;
-        }
-        else {
-            return insAux(arv,regs[aux]);
-        }           
+        return insAux(arv,regs[aux]);
     } else {
-        pos = arv.calcPos(chave);
-        if (regs[pos] <= 0) {
-            return arv;
-        }
+        return insAux(arv,chave);
     }
 }
 
@@ -134,6 +131,7 @@ void ins() {
         elem++;
         ok = true;
     } else {
+        insAux(arv,chave);
 //        while (arv.temProx()) {
 //            id = arv.getProxNoId();
 //            if (arv.isProxNoDir()) {
@@ -154,7 +152,7 @@ void ins() {
 //                }
 //            }
 //        }
-        //Caminha a arvore do no vazio ate a raiz
+        //Caminha a arvore do no vazio ate a raiz empilhando os nos
         id = arv.getNoId();
         while (!arv.isNoRaiz(id)) {
             pilha.push(pos);
@@ -164,8 +162,10 @@ void ins() {
         }
         //Desempilha as posicoes e as ids dos nos da arvore
         while (!pilha.empty()) {
-            pos = pilha.pop();
-            id = pilhaId.pop;
+            pos = pilha.top();
+            pilha.pop();
+            id = pilhaId.top();
+            pilha.pop();
             if (arv.isNoDir(id)) {
                 aux = arv.getNoPai(id);
                 regAux = regs[pos];

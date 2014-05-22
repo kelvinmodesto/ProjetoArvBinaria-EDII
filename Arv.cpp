@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#define TAM 11
+#define TAM TAM
 
 class Arv {
 private:
@@ -92,11 +92,11 @@ public:
     }
 };
 
-int regs[11], elem;
+int regs[TAM], elem;
 
 void inic() {
     elem = 0;
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < TAM; i++) {
         regs[i] = 0;
     }
 }
@@ -118,12 +118,13 @@ Arv insAux(Arv arv, int chave) {
     if (arv.isProxNoDir()) {
         return insAux(arv, regs[aux]);
     } else {
+        chave = arv.getNoPai(arv.getProxNoId());
         return insAux(arv, chave);
     }
 }
 
 void ins() {
-    if (elem == 11) {
+    if (elem == TAM) {
         cout << "O registro nao foi inserido" << endl;
         return;
     }
@@ -180,9 +181,9 @@ void ins() {
                 pos = pilha.top();
                 pilha.pop();
                 id = pilhaId.top();
-                pilhaId.pop();
-                cout << "No[" << id << "]=" << pos << endl;
+                pilhaId.pop();                
                 if (arv.isNoDir(id)) {
+                    cout << "NoDir[" << id << "]=" << pos << endl;
                     aux = arv.getNoPai(id);
                     regAux = regs[pos];
                     regs[pos] = regs[aux];
@@ -192,6 +193,8 @@ void ins() {
                         elem++;
                         ok = true;
                     }
+                } else {
+                    cout << "NoEsq[" << id << "]=" << pos << endl;
                 }
             }
             cout << endl;
@@ -276,7 +279,7 @@ void rem() {
 
 void exib() {
     cout << "Exibir registros" << endl;
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < TAM; i++) {
         cout << "Reg[" << i << "] = ";
         cout << regs[i] << endl;
     }

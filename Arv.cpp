@@ -5,36 +5,41 @@
 
 using namespace std;
 
+#define TAM 11
+
 class Arv {
 private:
-    int tam, elem, arv[55];
+    int elem, arv[TAM * 10];
 
     int hash(int chave) {
-        return chave % tam;
+        return chave % TAM;
     }
 
     int inc(int chave) {
-        return (chave / tam) % tam;
+        return (chave / TAM) % TAM;
     }
 public:
 
     Arv() {
-        tam = 11;
         elem = 0;
     }
 
     int calcPos(int chave) {
+        cout << "Calculando a posicao da chave " << chave << endl;
         if (elem == 0) {
             arv[elem] = hash(chave);
         } else {
             int aux = inc(chave);
-            if (aux > 0)
+            if (aux > 0) {
                 arv[elem] = getNoPai(elem) + aux;
-            else
+            } else {
                 arv[elem] = getNoPai(elem) + 1;
-            if (arv[elem] >= tam)
-                arv[elem] %= tam;
+            }
+            if (arv[elem] >= TAM)
+                arv[elem] %= TAM;
         }
+        cout << "Pos: " << arv[elem] << endl;
+        cout << endl;
         return arv[elem++];
     }
 
@@ -71,15 +76,15 @@ public:
     }
 
     int getNoId() {
-        return elem-1;
+        return elem - 1;
     }
-    
+
     int getProxNoId() {
         return elem;
     }
 
     bool temProx() {
-        return elem < 55;
+        return elem < (TAM * 10);
     }
 
     bool isProxNoDir() {
@@ -96,20 +101,24 @@ void inic() {
     }
 }
 
-Arv insAux(Arv arv,int chave) {
+Arv insAux(Arv arv, int chave) {
     int pos, aux, id;
     //Verifica se ta vazio a posicao
     id = arv.getProxNoId();
     aux = arv.getNoPai(id);
-    pos = arv.calcPos(regs[aux]);
+    if (arv.isProxNoDir()) {
+        pos = arv.calcPos(regs[aux]);
+    } else {
+        pos = arv.calcPos(chave);
+    }
     if (regs[pos] <= 0) {
         return arv;
     }
     //Nao estando vazio executa insAux de 
     if (arv.isProxNoDir()) {
-        return insAux(arv,regs[aux]);
+        return insAux(arv, regs[aux]);
     } else {
-        return insAux(arv,chave);
+        return insAux(arv, chave);
     }
 }
 
@@ -125,64 +134,73 @@ void ins() {
     cout << "Inserir registro" << endl;
     cout << "Chave: ";
     cin >> chave;
+    cout << endl;
     int pos = arv.calcPos(chave);
     if (regs[pos] <= 0) {
         regs[pos] = chave;
         elem++;
         ok = true;
     } else {
-        insAux(arv,chave);
-//        while (arv.temProx()) {
-//            id = arv.getProxNoId();
-//            if (arv.isProxNoDir()) {
-//                aux = arv.getNoPai(id);
-//                pos = arv.calcPos(regs[aux]);
-//                if (regs[pos] <= 0) {
-//                    regs[pos] = regs[aux];
-//                    regs[aux] = chave;
-//                    elem++;
-//                    break;
-//                }
-//            } else {
-//                pos = arv.calcPos(chave);
-//                if (regs[pos] <= 0) {
-//                    regs[pos] = chave;
-//                    elem++;
-//                    break;
-//                }
-//            }
-//        }
+        arv = insAux(arv, chave);
+        //        while (arv.temProx()) {
+        //            id = arv.getProxNoId();
+        //            if (arv.isProxNoDir()) {
+        //                aux = arv.getNoPai(id);
+        //                pos = arv.calcPos(regs[aux]);
+        //                if (regs[pos] <= 0) {
+        //                    regs[pos] = regs[aux];
+        //                    regs[aux] = chave;
+        //                    elem++;
+        //                    break;
+        //                }
+        //            } else {
+        //                pos = arv.calcPos(chave);
+        //                if (regs[pos] <= 0) {
+        //                    regs[pos] = chave;
+        //                    elem++;
+        //                    break;
+        //                }
+        //            }
+        //        }
         //Caminha a arvore do no vazio ate a raiz empilhando os nos
-        id = arv.getNoId();
-        while (!arv.isNoRaiz(id)) {
-            pilha.push(pos);
-            pilhaId.push(id);
-            pos = arv.getNoPai(id);
-            id = arv.getNoPaiId(id);
-        }
-        //Desempilha as posicoes e as ids dos nos da arvore
-        while (!pilha.empty()) {
-            pos = pilha.top();
-            pilha.pop();
-            id = pilhaId.top();
-            pilha.pop();
-            if (arv.isNoDir(id)) {
-                aux = arv.getNoPai(id);
-                regAux = regs[pos];
-                regs[pos] = regs[aux];
-                regs[aux] = chave;
-                chave = regAux;
-                if (!ok) {
-                    elem++;
-                    ok = true;
+        if (arv.temProx()) {
+            id = arv.getNoId();
+            pos = arv.getNo(id);
+            cout << "Empilhando os nos" << endl;
+            while (!arv.isNoRaiz(id)) {
+                cout << "No[" << id << "]=" << pos << endl;
+                pilha.push(pos);
+                pilhaId.push(id);
+                pos = arv.getNoPai(id);
+                id = arv.getNoPaiId(id);
+            }
+            cout << endl;
+            cout << "Desempilhando os nos" << endl;
+            while (!pilha.empty()) {
+                pos = pilha.top();
+                pilha.pop();
+                id = pilhaId.top();
+                pilhaId.pop();
+                cout << "No[" << id << "]=" << pos << endl;
+                if (arv.isNoDir(id)) {
+                    aux = arv.getNoPai(id);
+                    regAux = regs[pos];
+                    regs[pos] = regs[aux];
+                    regs[aux] = chave;
+                    chave = regAux;
+                    if (!ok) {
+                        elem++;
+                        ok = true;
+                    }
                 }
             }
-        }
-        //Caso insira por caminhamento
-        if (pilha.empty()&&!ok) {
-            regs[pos] = chave;
-            elem++;
-            ok = true;
+            cout << endl;
+            //Caso insira por caminhamento
+            if (pilha.empty()&&!ok) {
+                regs[pos] = chave;
+                elem++;
+                ok = true;
+            }
         }
         if (ok) {
             cout << "O registro foi inserido" << endl;
